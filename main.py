@@ -1,8 +1,12 @@
 from os import getenv
 from dotenv import load_dotenv
 
-import psycopg2
-from psycopg2.extras import NamedTupleCursor
+from models import create_tables
+from load_test_data import load_data
+
+import sqlalchemy as db
+from sqlalchemy.orm import sessionmaker
+
 
 
 if __name__ == '__main__':
@@ -12,9 +16,19 @@ if __name__ == '__main__':
     db_user = getenv('DB_USER')
     db_pass = getenv('DB_PASS')
 
-    with psycopg2.connect(dbname='postgres', user=db_user, password=db_pass, host=db_host, port=db_port) as conn:
-        pass
+    db_name = 'postgres'
+    engine = db.create_engine(f"postgresql+psycopg2://{db_user}:{db_pass}@{db_host}/{db_name}",
+                              echo=True)
+
+    create_tables(engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    load_data(session, 'test_data.json')
 
 
 
-    conn.close()
+    session.close()
+
+
