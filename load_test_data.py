@@ -22,7 +22,6 @@ def load_data(session, json_path):
             'stock': Stock,
             'sale': Sale,
         }[record.get('model')]
-        print(record)
         session.add(model(id=record.get('pk'), **record.get('fields')))
         session.commit()
 
